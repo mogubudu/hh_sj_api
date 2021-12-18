@@ -3,11 +3,9 @@ import os
 from collections import defaultdict
 from itertools import count
 from dotenv import load_dotenv
+from terminaltables import AsciiTable
 
-load_dotenv()
-secret_key = os.getenv('SUPERJOB_TOKEN')
-
-def vacancies_found(query):
+def vacancies_found_hh(query):
     url = 'https://api.hh.ru/vacancies'
     params = {
             'area': 1,
@@ -19,7 +17,7 @@ def vacancies_found(query):
     vacancies_found = request.json()['found']
     return vacancies_found
 
-def get_stat_to_most_popular_language():
+def get_stat_to_most_popular_language_hh():
     most_popular_language = ['javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift']
     vacancies_stat = defaultdict(dict)
 
@@ -27,9 +25,9 @@ def get_stat_to_most_popular_language():
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
         salaries = get_salary_from_hh(response)
-        vacancies_stat[language]['vacancies_found'] = vacancies_found(query)
+        vacancies_stat[language]['vacancies_found'] = vacancies_found_hh(query)
         vacancies_stat[language]['vacancies_processed'] = len(salaries)
-        vacancies_stat[language]['average_salary'] = mean_predict_salary(predict_rub_salary(salaries))
+        vacancies_stat[language]['average_salary'] = mean_predict_salary(predict_rub_salary_hh(salaries))
     
     return vacancies_stat
 
@@ -45,14 +43,14 @@ def get_vacancies_from_hh(text):
             'date_to': '2021-12-12',
         }
 
-        request = requests.get(url, params=params)
-        responce = request.json()
-        for vacancie in responce['items']:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        response = response.json()
+        for vacancie in response['items']:
             vacancies.append(vacancie)
     
-        last_page = responce['pages']
-        ### выдавало ошибку bad request, мол я не могу получать более 2000 объектов
-        if page >= last_page or page == 99:
+        last_page = response['pages']
+        if page >= last_page:
             break
     
     return vacancies
@@ -69,7 +67,7 @@ def get_salary_from_hh(vacancies):
     return salaries
 
 
-def predict_rub_salary(salaries):
+def predict_rub_salary_hh(salaries):
     predict_salaries = []
     for salary in salaries:
         if salary['currency'] != 'RUR':
@@ -113,52 +111,113 @@ def get_vacancies_from_superJob(secret_key, keywords=''):
             'X-Api-App-Id': secret_key,
         }
         response = requests.get(url, params=params, headers=data)
+        response.raise_for_status()
         response = response.json()['objects']
-        vacancies.append(response)
+        for vacancie in response: 
+            vacancies.append(vacancie)
         
     return vacancies
-    # for profession in response:
-    #     print(profession['profession'], profession['town']['title'], predict_rub_salary_for_superJob(profession), sep=', ')
 
 def predict_rub_salary_for_superJob(vacancies):
-    predict_salary = 0
+    predict_salaries = []
 
-    if vacancies['payment_from'] == 0 and vacancies['payment_to'] == 0:
-        predict_salary = None
-    elif vacancies['payment_from'] != 0 and vacancies['payment_to'] != 0:
-        predict_salary = (vacancies['payment_from'] + vacancies['payment_to']) / 2
-    elif vacancies['payment_from'] != 0:
-        predict_salary = vacancies['payment_from'] * 1.2    
-    elif vacancies['payment_to'] != 0:
-        predict_salary = vacancies['payment_to'] * 0.8
-    else:
-        predict_salary = None
+    for vacancie in vacancies:
+        if vacancie['payment_from'] == 0 and vacancie['payment_to'] == 0:
+            predict_salaries.append(None)
+        elif vacancie['payment_from'] != 0 and vacancie['payment_to'] != 0:
+            predict_salary = (vacancie['payment_from'] + vacancie['payment_to']) / 2
+            predict_salaries.append(predict_salary)
+        elif vacancie['payment_from'] != 0:
+            predict_salary = vacancie['payment_from'] * 1.2    
+            predict_salaries.append(predict_salary)
+        elif vacancie['payment_to'] != 0:
+            predict_salary = vacancie['payment_to'] * 0.8
+            predict_salaries.append(predict_salary)
 
-    return predict_salary
+    return predict_salaries
 
 
-def get_stat_to_most_popular_language_superJob():
+def vacancies_found_superJob(secret_key, keywords):
+    url = 'https://api.superjob.ru/2.0/vacancies/'
+    params = {
+            'town': 4,
+            'catalogues': 48,
+            'keywords': ['keys', keywords]
+        }
+    data = {
+            'X-Api-App-Id': secret_key,
+        }
+    
+    request = requests.get(url, params=params, headers=data)
+    vacancies_found = request.json()['total']
+    return vacancies_found
+
+
+def get_salary_from_superJob(vacancies):
+    salaries = []
+
+    for vacancie in vacancies:
+        salary = vacancie['salary']
+        if salary is not None:
+            salaries.append(salary)
+        
+    return salaries
+
+
+def get_stat_to_most_popular_language_superJob(secret_key):
     most_popular_language = ['javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift']
     vacancies_stat = defaultdict(dict)
 
     for language in most_popular_language:
         keywords = f'Программист {language}'
         response = get_vacancies_from_superJob(secret_key, keywords=keywords)
-        salaries = []
-        vacancies_stat[language]['vacancies_found'] = 0
-        for item in response:
-            for profession in item:
-                salary = predict_rub_salary_for_superJob(profession)
-                if salary is not None:
-                    salaries.append(salary)
-                vacancies_stat[language]['vacancies_found'] = len(item)
-                vacancies_stat[language]['vacancies_processed'] = len(salaries)
-                vacancies_stat[language]['average_salary'] = mean_predict_salary(salaries)
+        salary = predict_rub_salary_for_superJob(response)
+        vacancies_stat[language]['vacancies_found'] = vacancies_found_superJob(keywords)
+        vacancies_stat[language]['vacancies_processed'] = len(salary)
+        vacancies_stat[language]['average_salary'] = mean_predict_salary(salary)
         
     return vacancies_stat
 
+def print_stat_superJob(secret_key):
+    title = 'SuperJob Moscow'
+    statistics_superJob = get_stat_to_most_popular_language_superJob(secret_key)
+    table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
+    for language in statistics_superJob:
+        row = []
+        row.append(language)
+        row.append(statistics_superJob[language]['vacancies_found'])
+        row.append(statistics_superJob[language]['vacancies_processed'])
+        row.append(statistics_superJob[language]['average_salary'])
+        table_data.append(row)
+    
+    table = AsciiTable(table_data, title)
+    print(table.table)
+
+def print_stat_hh():
+    title = 'HeadHunter Moscow'
+    statistics_superJob = get_stat_to_most_popular_language_hh()
+    table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
+    for language in statistics_superJob:
+        row = []
+        row.append(language)
+        row.append(statistics_superJob[language]['vacancies_found'])
+        row.append(statistics_superJob[language]['vacancies_processed'])
+        row.append(statistics_superJob[language]['average_salary'])
+        table_data.append(row)
+    
+    table = AsciiTable(table_data, title)
+    print(table.table)
+    
+    
+
+    
+
 def main():
-    print(get_stat_to_most_popular_language_superJob())
+    load_dotenv()
+    secret_key = os.getenv('SUPERJOB_TOKEN')
+    print_stat_superJob(secret_key)
+    print_stat_hh()
+
 
 if __name__ == "__main__":
     main()
