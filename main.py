@@ -8,7 +8,6 @@ from terminaltables import AsciiTable
 def get_stat_to_most_popular_language_hh(*languages):
     vacancies_stat = defaultdict(dict)
     for language in languages:
-        print(language)
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
         salaries = get_salary_from_hh(response[1])
@@ -148,37 +147,18 @@ def get_stat_to_most_popular_language_superjob(secret_key, *languages):
         
     return vacancies_stat
 
-def print_stat_superjob(secret_key):
-    title = 'SuperJob Moscow'
-    statistics_superjob = get_stat_to_most_popular_language_superjob(secret_key)
+def print_stat_to_vacancies(statistics, title=''):
     table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language in statistics_superjob:
+    for language in statistics:
         row = []
         row.append(language)
-        row.append(statistics_superjob[language]['vacancies_found'])
-        row.append(statistics_superjob[language]['vacancies_processed'])
-        row.append(statistics_superjob[language]['average_salary'])
+        row.append(statistics[language]['vacancies_found'])
+        row.append(statistics[language]['vacancies_processed'])
+        row.append(statistics[language]['average_salary'])
         table_data.append(row)
     
     table = AsciiTable(table_data, title)
     print(table.table)
-
-def print_stat_hh():
-    title = 'HeadHunter Moscow'
-    statistics_superjob = get_stat_to_most_popular_language_hh()
-    table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language in statistics_superjob:
-        row = []
-        row.append(language)
-        row.append(statistics_superjob[language]['vacancies_found'])
-        row.append(statistics_superjob[language]['vacancies_processed'])
-        row.append(statistics_superjob[language]['average_salary'])
-        table_data.append(row)
-    
-    table = AsciiTable(table_data, title)
-    print(table.table)
-    
-    
 
     
 
@@ -186,7 +166,10 @@ def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
     languages = 'javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift'
-    print(get_stat_to_most_popular_language_superjob(secret_key, 'java', 'js', 'python'))
+    statistics_sj = get_stat_to_most_popular_language_superjob(secret_key, 'java', 'js', 'python')
+    statistics_hh = get_stat_to_most_popular_language_hh('java', 'js', 'python')
+    print_stat_to_vacancies(statistics_sj, 'SuperJob Moscow')
+    print_stat_to_vacancies(statistics_hh, 'HeadHunter Moscow')
 
 if __name__ == "__main__":
     main()
