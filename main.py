@@ -5,11 +5,10 @@ from itertools import count
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
-def get_stat_to_most_popular_language_hh():
-    most_popular_language = ['javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift']
+def get_stat_to_most_popular_language_hh(*languages):
     vacancies_stat = defaultdict(dict)
-
-    for language in most_popular_language:
+    for language in languages:
+        print(language)
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
         salaries = get_salary_from_hh(response[1])
@@ -34,8 +33,7 @@ def get_vacancies_from_hh(text):
         response.raise_for_status()
         response = response.json()
         vacancies_found = response['found']
-        for vacancie in response['items']:
-            vacancies.append(vacancie)
+        vacancies.extend(response['items'])
 
         last_page = response['pages'] - 1
         if page == last_page:
@@ -100,9 +98,8 @@ def get_vacancies_from_superJob(secret_key, keywords=''):
         response = requests.get(url, params=params, headers=data)
         response.raise_for_status()
         response = response.json()
-        vacancies_found = response['total']
-        for vacancie in response['objects']: 
-            vacancies.append(vacancie)
+        vacancies_found = response['total'] 
+        vacancies.extend(response['objects'])
         if not response['more']:
             break
         
@@ -138,11 +135,10 @@ def get_salary_from_superJob(vacancies):
     return salaries
 
 
-def get_stat_to_most_popular_language_superJob(secret_key):
-    most_popular_language = ['javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift']
+def get_stat_to_most_popular_language_superJob(secret_key, *languages):
     vacancies_stat = defaultdict(dict)
 
-    for language in most_popular_language:
+    for language in languages:
         keywords = f'Программист {language}'
         response = get_vacancies_from_superJob(secret_key, keywords=keywords)
         salary = predict_rub_salary_for_superJob(response[1])
@@ -189,7 +185,8 @@ def print_stat_hh():
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    get_vacancies_from_superJob(secret_key, 'Программист python')
+    languages = 'javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift'
+    print(get_stat_to_most_popular_language_superJob(secret_key, 'java', 'js', 'python'))
 
 if __name__ == "__main__":
     main()
