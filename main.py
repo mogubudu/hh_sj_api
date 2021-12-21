@@ -82,7 +82,7 @@ def mean_predict_salary(salaries):
 
         return mean_salary
 
-def get_vacancies_from_superJob(secret_key, keywords=''):
+def get_vacancies_from_superjob(secret_key, keywords=''):
     url = 'https://api.superjob.ru/2.0/vacancies/'
     vacancies = []
     for page in count(0):
@@ -105,7 +105,7 @@ def get_vacancies_from_superJob(secret_key, keywords=''):
         
     return (vacancies_found, vacancies)
 
-def predict_rub_salary_for_superJob(vacancies):
+def predict_rub_salary_for_superjob(vacancies):
     predict_salaries = []
 
     for vacancie in vacancies:
@@ -124,7 +124,7 @@ def predict_rub_salary_for_superJob(vacancies):
     return predict_salaries
 
 
-def get_salary_from_superJob(vacancies):
+def get_salary_from_superjob(vacancies):
     salaries = []
 
     for vacancie in vacancies:
@@ -135,29 +135,29 @@ def get_salary_from_superJob(vacancies):
     return salaries
 
 
-def get_stat_to_most_popular_language_superJob(secret_key, *languages):
+def get_stat_to_most_popular_language_superjob(secret_key, *languages):
     vacancies_stat = defaultdict(dict)
 
     for language in languages:
         keywords = f'Программист {language}'
-        response = get_vacancies_from_superJob(secret_key, keywords=keywords)
-        salary = predict_rub_salary_for_superJob(response[1])
+        response = get_vacancies_from_superjob(secret_key, keywords=keywords)
+        salary = predict_rub_salary_for_superjob(response[1])
         vacancies_stat[language]['vacancies_found'] = response[0]
         vacancies_stat[language]['vacancies_processed'] = len(salary)
         vacancies_stat[language]['average_salary'] = mean_predict_salary(salary)
         
     return vacancies_stat
 
-def print_stat_superJob(secret_key):
+def print_stat_superjob(secret_key):
     title = 'SuperJob Moscow'
-    statistics_superJob = get_stat_to_most_popular_language_superJob(secret_key)
+    statistics_superjob = get_stat_to_most_popular_language_superjob(secret_key)
     table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language in statistics_superJob:
+    for language in statistics_superjob:
         row = []
         row.append(language)
-        row.append(statistics_superJob[language]['vacancies_found'])
-        row.append(statistics_superJob[language]['vacancies_processed'])
-        row.append(statistics_superJob[language]['average_salary'])
+        row.append(statistics_superjob[language]['vacancies_found'])
+        row.append(statistics_superjob[language]['vacancies_processed'])
+        row.append(statistics_superjob[language]['average_salary'])
         table_data.append(row)
     
     table = AsciiTable(table_data, title)
@@ -165,14 +165,14 @@ def print_stat_superJob(secret_key):
 
 def print_stat_hh():
     title = 'HeadHunter Moscow'
-    statistics_superJob = get_stat_to_most_popular_language_hh()
+    statistics_superjob = get_stat_to_most_popular_language_hh()
     table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language in statistics_superJob:
+    for language in statistics_superjob:
         row = []
         row.append(language)
-        row.append(statistics_superJob[language]['vacancies_found'])
-        row.append(statistics_superJob[language]['vacancies_processed'])
-        row.append(statistics_superJob[language]['average_salary'])
+        row.append(statistics_superjob[language]['vacancies_found'])
+        row.append(statistics_superjob[language]['vacancies_processed'])
+        row.append(statistics_superjob[language]['average_salary'])
         table_data.append(row)
     
     table = AsciiTable(table_data, title)
@@ -186,7 +186,7 @@ def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
     languages = 'javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift'
-    print(get_stat_to_most_popular_language_superJob(secret_key, 'java', 'js', 'python'))
+    print(get_stat_to_most_popular_language_superjob(secret_key, 'java', 'js', 'python'))
 
 if __name__ == "__main__":
     main()
