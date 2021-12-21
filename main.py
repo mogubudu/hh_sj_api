@@ -20,12 +20,14 @@ def get_stat_to_most_popular_language_hh(*languages):
 def get_vacancies_from_hh(text):
     url = 'https://api.hh.ru/vacancies'
     vacancies = []
+    moscow_id = 1
+    days = 30
     for page in count(0):
         params = {
-            'area': 1,
+            'area': moscow_id,
             'text': text,
             'page': page,
-            'period': 30,
+            'period': days,
         }
 
         response = requests.get(url, params=params)
@@ -84,10 +86,12 @@ def mean_predict_salary(salaries):
 def get_vacancies_from_superjob(secret_key, keywords=''):
     url = 'https://api.superjob.ru/2.0/vacancies/'
     vacancies = []
+    moscow_id = 4
+    it_vacancies_catalog_id = 48
     for page in count(0):
         params = {
-            'town': 4,
-            'catalogues': 48,
+            'town': moscow_id,
+            'catalogues': it_vacancies_catalog_id,
             'page': page,
             'keywords': ['keys', keywords]
         }
@@ -165,9 +169,8 @@ def print_stat_to_vacancies(statistics, title=''):
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    languages = 'javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift'
-    statistics_sj = get_stat_to_most_popular_language_superjob(secret_key, 'java', 'js', 'python')
-    statistics_hh = get_stat_to_most_popular_language_hh('java', 'js', 'python')
+    statistics_sj = get_stat_to_most_popular_language_superjob(secret_key, 'javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift')
+    statistics_hh = get_stat_to_most_popular_language_hh('javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift')
     print_stat_to_vacancies(statistics_sj, 'SuperJob Moscow')
     print_stat_to_vacancies(statistics_hh, 'HeadHunter Moscow')
 
