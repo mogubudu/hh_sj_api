@@ -44,6 +44,7 @@ def get_vacancies_from_hh(text):
         response = requests.get(url, params=params)
         response.raise_for_status()
         response = response.json()
+        vacancies_found = response['found']
         for vacancie in response['items']:
             vacancies.append(vacancie)
     
@@ -213,9 +214,7 @@ def print_stat_hh():
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    print_stat_superJob(secret_key)
-    print_stat_hh()
-
+    print(get_vacancies_from_hh('Программист python'))
 
 if __name__ == "__main__":
     main()
