@@ -5,17 +5,6 @@ from itertools import count
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
-def vacancies_found_hh(query):
-    url = 'https://api.hh.ru/vacancies'
-    params = {
-            'area': 1,
-            'text': query,
-            'period': 30,
-        }
-    request = requests.get(url, params=params)
-    vacancies_found = request.json()['found']
-    return vacancies_found
-
 def get_stat_to_most_popular_language_hh():
     most_popular_language = ['javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift']
     vacancies_stat = defaultdict(dict)
@@ -23,8 +12,8 @@ def get_stat_to_most_popular_language_hh():
     for language in most_popular_language:
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
-        salaries = get_salary_from_hh(response)
-        vacancies_stat[language]['vacancies_found'] = vacancies_found_hh(query)
+        salaries = get_salary_from_hh(response[1])
+        vacancies_stat[language]['vacancies_found'] = response[0]
         vacancies_stat[language]['vacancies_processed'] = len(salaries)
         vacancies_stat[language]['average_salary'] = mean_predict_salary(predict_rub_salary_hh(salaries))
     
@@ -47,12 +36,12 @@ def get_vacancies_from_hh(text):
         vacancies_found = response['found']
         for vacancie in response['items']:
             vacancies.append(vacancie)
-    
-        last_page = response['pages']
-        if page >= last_page:
+
+        last_page = response['pages'] - 1
+        if page == last_page:
             break
     
-    return vacancies
+    return (vacancies_found, vacancies)
 
 
 def get_salary_from_hh(vacancies):
@@ -214,7 +203,7 @@ def print_stat_hh():
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    print(get_vacancies_from_hh('Программист python'))
+    print(get_stat_to_most_popular_language_hh())
 
 if __name__ == "__main__":
     main()
