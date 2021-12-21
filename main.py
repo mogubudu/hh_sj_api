@@ -109,15 +109,15 @@ def predict_rub_salary_for_superjob(vacancies):
     predict_salaries = []
 
     for vacancie in vacancies:
-        if vacancie['payment_from'] == 0 and vacancie['payment_to'] == 0:
+        if not vacancie['payment_from'] and not vacancie['payment_to']:
             predict_salaries.append(None)
-        elif vacancie['payment_from'] != 0 and vacancie['payment_to'] != 0:
+        elif vacancie['payment_from'] and vacancie['payment_to']:
             predict_salary = (vacancie['payment_from'] + vacancie['payment_to']) / 2
             predict_salaries.append(predict_salary)
-        elif vacancie['payment_from'] != 0:
+        elif vacancie['payment_from']:
             predict_salary = vacancie['payment_from'] * 1.2    
             predict_salaries.append(predict_salary)
-        elif vacancie['payment_to'] != 0:
+        elif vacancie['payment_to']:
             predict_salary = vacancie['payment_to'] * 0.8
             predict_salaries.append(predict_salary)
 
