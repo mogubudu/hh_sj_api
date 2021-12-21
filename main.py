@@ -100,11 +100,12 @@ def get_vacancies_from_superJob(secret_key, keywords=''):
         }
         response = requests.get(url, params=params, headers=data)
         response.raise_for_status()
-        response = response.json()['objects']
-        for vacancie in response: 
+        response = response.json()
+        vacancies_found = response['total']
+        for vacancie in response['objects']: 
             vacancies.append(vacancie)
         
-    return vacancies
+    return (vacancies_found, vacancies)
 
 def predict_rub_salary_for_superJob(vacancies):
     predict_salaries = []
@@ -125,22 +126,6 @@ def predict_rub_salary_for_superJob(vacancies):
     return predict_salaries
 
 
-def vacancies_found_superJob(secret_key, keywords):
-    url = 'https://api.superjob.ru/2.0/vacancies/'
-    params = {
-            'town': 4,
-            'catalogues': 48,
-            'keywords': ['keys', keywords]
-        }
-    data = {
-            'X-Api-App-Id': secret_key,
-        }
-    
-    request = requests.get(url, params=params, headers=data)
-    vacancies_found = request.json()['total']
-    return vacancies_found
-
-
 def get_salary_from_superJob(vacancies):
     salaries = []
 
@@ -159,8 +144,8 @@ def get_stat_to_most_popular_language_superJob(secret_key):
     for language in most_popular_language:
         keywords = f'Программист {language}'
         response = get_vacancies_from_superJob(secret_key, keywords=keywords)
-        salary = predict_rub_salary_for_superJob(response)
-        vacancies_stat[language]['vacancies_found'] = vacancies_found_superJob(keywords)
+        salary = predict_rub_salary_for_superJob(response[1])
+        vacancies_stat[language]['vacancies_found'] = response[0]
         vacancies_stat[language]['vacancies_processed'] = len(salary)
         vacancies_stat[language]['average_salary'] = mean_predict_salary(salary)
         
@@ -203,7 +188,7 @@ def print_stat_hh():
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    print(get_stat_to_most_popular_language_hh())
+    print(get_stat_to_most_popular_language_superJob(secret_key))
 
 if __name__ == "__main__":
     main()
