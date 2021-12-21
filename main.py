@@ -10,8 +10,7 @@ def vacancies_found_hh(query):
     params = {
             'area': 1,
             'text': query,
-            'date_from': '2021-12-01',
-            'date_to': '2021-12-12',
+            'period': 30,
         }
     request = requests.get(url, params=params)
     vacancies_found = request.json()['found']
@@ -39,8 +38,7 @@ def get_vacancies_from_hh(text):
             'area': 1,
             'text': text,
             'page': page,
-            'date_from': '2021-12-01',
-            'date_to': '2021-12-12',
+            'period': 30,
         }
 
         response = requests.get(url, params=params)
