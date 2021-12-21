@@ -87,12 +87,11 @@ def mean_predict_salary(salaries):
 def get_vacancies_from_superJob(secret_key, keywords=''):
     url = 'https://api.superjob.ru/2.0/vacancies/'
     vacancies = []
-    for page in range(4):
+    for page in count(0):
         params = {
             'town': 4,
             'catalogues': 48,
             'page': page,
-            'count': 100,
             'keywords': ['keys', keywords]
         }
         data = {
@@ -104,6 +103,8 @@ def get_vacancies_from_superJob(secret_key, keywords=''):
         vacancies_found = response['total']
         for vacancie in response['objects']: 
             vacancies.append(vacancie)
+        if not response['more']:
+            break
         
     return (vacancies_found, vacancies)
 
@@ -188,7 +189,7 @@ def print_stat_hh():
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    print(get_stat_to_most_popular_language_superJob(secret_key))
+    get_vacancies_from_superJob(secret_key, 'Программист python')
 
 if __name__ == "__main__":
     main()
