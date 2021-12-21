@@ -59,13 +59,13 @@ def predict_rub_salary_hh(salaries):
         if salary['currency'] != 'RUR':
             predict_salary = None
 
-        elif salary['from'] is not None and salary['to'] is not None:
+        elif salary['from'] and salary['to']:
             predict_salary = (salary['from'] + salary['to']) / 2
 
-        elif salary['from'] is not None:
+        elif salary['from']:
             predict_salary = salary['from'] * 1.2
         
-        elif salary['to'] is not None:
+        elif salary['to']:
             predict_salary = salary['to'] * 0.8
         
         predict_salaries.append(predict_salary)
