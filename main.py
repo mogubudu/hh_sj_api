@@ -61,23 +61,23 @@ def get_salary_from_hh(vacancies):
 
 
 def predict_rub_salary_hh(salaries):
-    predict_salaries = []
+    estimated_salaries = []
     for salary in salaries:
         if salary['currency'] != 'RUR':
-            predict_salary = None
+            estimated_salary = None
 
         elif salary['from'] and salary['to']:
-            predict_salary = (salary['from'] + salary['to']) / 2
+            estimated_salary = (salary['from'] + salary['to']) / 2
 
         elif salary['from']:
-            predict_salary = salary['from'] * 1.2
+            estimated_salary = salary['from'] * 1.2
 
         elif salary['to']:
-            predict_salary = salary['to'] * 0.8
+            estimated_salary = salary['to'] * 0.8
 
-        predict_salaries.append(predict_salary)
+        estimated_salaries.append(estimated_salary)
 
-    return predict_salaries
+    return estimated_salaries
 
 
 def get_mean_predict_salary(salaries):
@@ -118,24 +118,23 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
 
 
 def predict_rub_salary_for_superjob(vacancies):
-    predict_salaries = []
+    estimated_salaries = []
 
     for vacancie in vacancies:
         if not vacancie['payment_from'] and not vacancie['payment_to']:
-            predict_salaries.append(None)
+            estimated_salaries.append(None)
         elif vacancie['payment_from'] and vacancie['payment_to']:
-            predict_salary = (vacancie['payment_from'] +
+            estimated_salary = (vacancie['payment_from'] +
                               vacancie['payment_to']) / 2
-
-            predict_salaries.append(predict_salary)
+            estimated_salaries.append(estimated_salary)
         elif vacancie['payment_from']:
-            predict_salary = vacancie['payment_from'] * 1.2
-            predict_salaries.append(predict_salary)
+            estimated_salary = vacancie['payment_from'] * 1.2
+            estimated_salaries.append(estimated_salary)
         elif vacancie['payment_to']:
-            predict_salary = vacancie['payment_to'] * 0.8
-            predict_salaries.append(predict_salary)
+            estimated_salary = vacancie['payment_to'] * 0.8
+            estimated_salaries.append(estimated_salary)
 
-    return predict_salaries
+    return estimated_salaries
 
 
 def get_salary_from_superjob(vacancies):
