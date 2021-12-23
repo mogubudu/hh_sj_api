@@ -42,7 +42,7 @@ def get_vacancies_from_hh(text):
         if page == last_page:
             break
     
-    return (vacancies_found, vacancies)
+    return vacancies_found, vacancies
 
 
 def get_salary_from_hh(vacancies):
@@ -109,7 +109,7 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
         if not response['more']:
             break
         
-    return (vacancies_found, vacancies)
+    return vacancies_found, vacancies
 
 def predict_rub_salary_for_superjob(vacancies):
     predict_salaries = []
