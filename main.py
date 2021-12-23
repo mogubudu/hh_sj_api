@@ -10,9 +10,10 @@ def get_stat_to_most_popular_language_hh(languages=[]):
     for language in languages:
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
-        salaries = get_salary_from_hh(response[1])
+        vacancies_found, salaries = response
+        salaries = get_salary_from_hh(salaries)
         vacancies_stat[language] = {
-            'vacancies_found': response[0],
+            'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
             'average_salary': mean_predict_salary(
                 predict_rub_salary_hh(salaries)
@@ -154,9 +155,10 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
     for language in languages:
         keywords = f'Программист {language}'
         response = get_vacancies_from_superjob(secret_key, keywords=keywords)
-        salary = predict_rub_salary_for_superjob(response[1])
+        vacancies_found, salaries = response
+        salary = predict_rub_salary_for_superjob(salaries)
         vacancies_stat[language] = {
-            'vacancies_found': response[0],
+            'vacancies_found': vacancies_found,
             'vacancies_processed': len(salary),
             'average_salary': mean_predict_salary(salary),
         }
@@ -170,12 +172,12 @@ def print_stat_to_vacancies(statistics, title=''):
                    'Вакансий обработано',
                    'Средняя зарплата']]
 
-    for language in statistics:
+    for language, language_statistics in statistics.items():
         row = [
             language,
-            statistics[language]['vacancies_found'],
-            statistics[language]['vacancies_processed'],
-            statistics[language]['average_salary']
+            language_statistics['vacancies_found'],
+            language_statistics['vacancies_processed'],
+            language_statistics['average_salary']
         ]
 
         table_data.append(row)
