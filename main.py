@@ -6,14 +6,16 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 def get_stat_to_most_popular_language_hh(*languages):
-    vacancies_stat = defaultdict(dict)
+    vacancies_stat = dict()
     for language in languages:
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
         salaries = get_salary_from_hh(response[1])
-        vacancies_stat[language]['vacancies_found'] = response[0]
-        vacancies_stat[language]['vacancies_processed'] = len(salaries)
-        vacancies_stat[language]['average_salary'] = mean_predict_salary(predict_rub_salary_hh(salaries))
+        vacancies_stat[language] = {
+            'vacancies_found': response[0],
+            'vacancies_processed': len(salaries),
+            'average_salary': mean_predict_salary(predict_rub_salary_hh(salaries)),
+        }
     
     return vacancies_stat
 
@@ -139,15 +141,17 @@ def get_salary_from_superjob(vacancies):
 
 
 def get_stat_to_most_popular_language_superjob(secret_key, *languages):
-    vacancies_stat = defaultdict(dict)
+    vacancies_stat = dict()
 
     for language in languages:
         keywords = f'Программист {language}'
         response = get_vacancies_from_superjob(secret_key, keywords=keywords)
         salary = predict_rub_salary_for_superjob(response[1])
-        vacancies_stat[language]['vacancies_found'] = response[0]
-        vacancies_stat[language]['vacancies_processed'] = len(salary)
-        vacancies_stat[language]['average_salary'] = mean_predict_salary(salary)
+        vacancies_stat[language] = {
+            'vacancies_found': response[0],
+            'vacancies_processed': len(salary),
+            'average_salary': mean_predict_salary(salary),
+        }
         
     return vacancies_stat
 
