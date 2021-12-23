@@ -158,11 +158,11 @@ def get_stat_to_most_popular_language_superjob(secret_key, *languages):
 def print_stat_to_vacancies(statistics, title=''):
     table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
     for language in statistics:
-        row = []
-        row.append(language)
-        row.append(statistics[language]['vacancies_found'])
-        row.append(statistics[language]['vacancies_processed'])
-        row.append(statistics[language]['average_salary'])
+        row = [language,
+        statistics[language]['vacancies_found'],
+        statistics[language]['vacancies_processed'],
+        statistics[language]['average_salary']]
+        
         table_data.append(row)
     
     table = AsciiTable(table_data, title)
