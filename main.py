@@ -78,8 +78,9 @@ def predict_rub_salary_hh(salaries):
 
 def mean_predict_salary(salaries):
     if salaries:
-        summ_salaries = sum([salary for salary in salaries if salary is not None])
-        len_salaries = len([salary for salary in salaries if salary is not None])
+        salaries = [salary for salary in salaries if salary is not None]
+        summ_salaries = sum(salaries)
+        len_salaries = len(salaries)
         
         mean_salary = int(summ_salaries / len_salaries)
 
