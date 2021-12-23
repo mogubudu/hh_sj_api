@@ -15,7 +15,7 @@ def get_stat_to_most_popular_language_hh(languages=[]):
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
-            'average_salary': mean_predict_salary(
+            'average_salary': get_mean_predict_salary(
                 predict_rub_salary_hh(salaries)
                 ),
         }
@@ -80,7 +80,7 @@ def predict_rub_salary_hh(salaries):
     return predict_salaries
 
 
-def mean_predict_salary(salaries):
+def get_mean_predict_salary(salaries):
     if salaries:
         salaries = [salary for salary in salaries if salary is not None]
         summ_salaries = sum(salaries)
@@ -160,7 +160,7 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salary),
-            'average_salary': mean_predict_salary(salary),
+            'average_salary': get_mean_predict_salary(salary),
         }
 
     return vacancies_stat
