@@ -5,7 +5,7 @@ from itertools import count
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
-def get_stat_to_most_popular_language_hh(*languages):
+def get_stat_to_most_popular_language_hh(languages=[]):
     vacancies_stat = dict()
     for language in languages:
         query = f'Программист {language}'
@@ -140,7 +140,7 @@ def get_salary_from_superjob(vacancies):
     return salaries
 
 
-def get_stat_to_most_popular_language_superjob(secret_key, *languages):
+def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
     vacancies_stat = dict()
 
     for language in languages:
@@ -173,8 +173,9 @@ def print_stat_to_vacancies(statistics, title=''):
 def main():
     load_dotenv()
     secret_key = os.getenv('SUPERJOB_TOKEN')
-    statistics_sj = get_stat_to_most_popular_language_superjob(secret_key, 'javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift')
-    statistics_hh = get_stat_to_most_popular_language_hh('javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift')
+    most_popular_languages = ['javascript', 'java', 'python', 'ruby', 'php', 'c++', 'c#', 'go', 'objective-c', 'scala', 'swift']
+    statistics_sj = get_stat_to_most_popular_language_superjob(secret_key, most_popular_languages)
+    statistics_hh = get_stat_to_most_popular_language_hh(most_popular_languages)
     print_stat_to_vacancies(statistics_sj, 'SuperJob Moscow')
     print_stat_to_vacancies(statistics_hh, 'HeadHunter Moscow')
 
