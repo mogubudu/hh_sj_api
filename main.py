@@ -39,12 +39,13 @@ def get_vacancies_from_hh(text):
         response = requests.get(url, params=params)
         response.raise_for_status()
         response = response.json()
-        vacancies_found = response['found']
         vacancies.extend(response['items'])
 
         last_page = response['pages'] - 1
         if page == last_page:
             break
+
+    vacancies_found = response['found']
 
     return vacancies_found, vacancies
 
@@ -109,10 +110,11 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
         response = requests.get(url, params=params, headers=data)
         response.raise_for_status()
         response = response.json()
-        vacancies_found = response['total']
         vacancies.extend(response['objects'])
         if not response['more']:
             break
+
+    vacancies_found = response['total']
 
     return vacancies_found, vacancies
 
