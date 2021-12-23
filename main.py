@@ -167,7 +167,7 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
     return vacancies_stat
 
 
-def print_stat_to_vacancies(statistics, title=''):
+def create_vacancies_stat_table(statistics, title=''):
     table_data = [['Язык программирования',
                    'Вакансий найдено',
                    'Вакансий обработано',
@@ -184,7 +184,7 @@ def print_stat_to_vacancies(statistics, title=''):
         table_data.append(row)
 
     table = AsciiTable(table_data, title)
-    print(table.table)
+    return table.table
 
 
 def main():
@@ -212,8 +212,10 @@ def main():
         languages=most_popular_languages
     )
 
-    print_stat_to_vacancies(statistics_sj, title='SuperJob Moscow')
-    print_stat_to_vacancies(statistics_hh, title='HeadHunter Moscow')
+    sj_table = create_vacancies_stat_table(statistics_sj, title='SuperJob Moscow')
+    hh_table = create_vacancies_stat_table(statistics_hh, title='HeadHunter Moscow')
+    print(sj_table)
+    print(hh_table)
 
 
 if __name__ == "__main__":
