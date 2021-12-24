@@ -103,6 +103,7 @@ def get_salaries_superjob(vacancies):
             processed_vacancies.append(processed_salary)
     return processed_vacancies
 
+
 def get_salary_from_superjob(vacancy):
     if vacancy['currency'] == 'rub':
         salary = {
@@ -128,6 +129,7 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
 
     return vacancies_stat
 
+
 def get_mean_estimated_salary(salaries):
     if salaries:
         salaries = [salary for salary in salaries if salary is not None]
@@ -137,6 +139,7 @@ def get_mean_estimated_salary(salaries):
         mean_salary = int(summ_salaries / len_salaries)
 
         return mean_salary
+
 
 def predict_salaries(salary):
     estimated_salary = None
@@ -149,6 +152,7 @@ def predict_salaries(salary):
         estimated_salary = salary['to'] * 0.8
 
     return estimated_salary
+
 
 def create_vacancies_stat_table(statistics, title=''):
     table_data = [['Язык программирования',
@@ -195,8 +199,10 @@ def main():
         languages=most_popular_languages
     )
 
-    sj_table = create_vacancies_stat_table(statistics_sj, title='SuperJob Moscow')
-    hh_table = create_vacancies_stat_table(statistics_hh, title='HeadHunter Moscow')
+    sj_table = create_vacancies_stat_table(statistics_sj,
+                                           title='SuperJob Moscow')
+    hh_table = create_vacancies_stat_table(statistics_hh,
+                                           title='HeadHunter Moscow')
     print(sj_table)
     print(hh_table)
 
