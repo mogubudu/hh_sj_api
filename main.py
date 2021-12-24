@@ -11,13 +11,11 @@ def get_stat_to_most_popular_language_hh(languages=[]):
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
         vacancies_found, salaries = response
-        salaries = get_salary_from_hh(salaries)
+        salaries = get_salaries_hh(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
-            'average_salary': get_mean_predict_salary(
-                predict_rub_salary_hh(salaries)
-                ),
+            'average_salary': get_mean_estimated_salary(salaries),
         }
 
     return vacancies_stat
@@ -50,46 +48,23 @@ def get_vacancies_from_hh(text):
     return vacancies_found, vacancies
 
 
-def get_salary_from_hh(vacancies):
-    salaries = []
-
-    for vacancie in vacancies:
-        salary = vacancie['salary']
-        if salary is not None:
-            salaries.append(salary)
-
-    return salaries
-
-
-def predict_rub_salary_hh(salaries):
-    estimated_salaries = []
-    for salary in salaries:
-        if salary['currency'] != 'RUR':
-            estimated_salary = None
-
-        elif salary['from'] and salary['to']:
-            estimated_salary = (salary['from'] + salary['to']) / 2
-
-        elif salary['from']:
-            estimated_salary = salary['from'] * 1.2
-
-        elif salary['to']:
-            estimated_salary = salary['to'] * 0.8
-
-        estimated_salaries.append(estimated_salary)
-
-    return estimated_salaries
+def get_salaries_hh(vacancies):
+    processed_vacancies = []
+    for vacancy in vacancies:
+        salary = get_salary_from_hh(vacancy)
+        if salary:
+            processed_salary = predict_salaries(salary)
+            processed_vacancies.append(processed_salary)
+    return processed_vacancies
 
 
-def get_mean_predict_salary(salaries):
-    if salaries:
-        salaries = [salary for salary in salaries if salary is not None]
-        summ_salaries = sum(salaries)
-        len_salaries = len(salaries)
-
-        mean_salary = int(summ_salaries / len_salaries)
-
-        return mean_salary
+def get_salary_from_hh(vacancy):
+    if vacancy['salary'] and vacancy['salary']['currency'] == 'RUR':
+        salary = {
+            'from': vacancy['salary']['from'],
+            'to': vacancy['salary']['to']
+        }
+        return salary
 
 
 def get_vacancies_from_superjob(secret_key, keywords=''):
@@ -119,35 +94,22 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
     return vacancies_found, vacancies
 
 
-def predict_rub_salary_for_superjob(vacancies):
-    estimated_salaries = []
+def get_salaries_superjob(vacancies):
+    processed_vacancies = []
+    for vacancy in vacancies:
+        salary = get_salary_from_superjob(vacancy)
+        if salary:
+            processed_salary = predict_salaries(salary)
+            processed_vacancies.append(processed_salary)
+    return processed_vacancies
 
-    for vacancie in vacancies:
-        if not vacancie['payment_from'] and not vacancie['payment_to']:
-            estimated_salaries.append(None)
-        elif vacancie['payment_from'] and vacancie['payment_to']:
-            estimated_salary = (vacancie['payment_from'] +
-                              vacancie['payment_to']) / 2
-            estimated_salaries.append(estimated_salary)
-        elif vacancie['payment_from']:
-            estimated_salary = vacancie['payment_from'] * 1.2
-            estimated_salaries.append(estimated_salary)
-        elif vacancie['payment_to']:
-            estimated_salary = vacancie['payment_to'] * 0.8
-            estimated_salaries.append(estimated_salary)
-
-    return estimated_salaries
-
-
-def get_salary_from_superjob(vacancies):
-    salaries = []
-
-    for vacancie in vacancies:
-        salary = vacancie['salary']
-        if salary is not None:
-            salaries.append(salary)
-
-    return salaries
+def get_salary_from_superjob(vacancy):
+    if vacancy['currency'] == 'rub':
+        salary = {
+            'from': vacancy['payment_from'],
+            'to': vacancy['payment_to']
+        }
+        return salary
 
 
 def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
@@ -157,15 +119,36 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
         keywords = f'Программист {language}'
         response = get_vacancies_from_superjob(secret_key, keywords=keywords)
         vacancies_found, salaries = response
-        salary = predict_rub_salary_for_superjob(salaries)
+        salaries = get_salaries_superjob(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
-            'vacancies_processed': len(salary),
-            'average_salary': get_mean_predict_salary(salary),
+            'vacancies_processed': len(salaries),
+            'average_salary': get_mean_estimated_salary(salaries),
         }
 
     return vacancies_stat
 
+def get_mean_estimated_salary(salaries):
+    if salaries:
+        salaries = [salary for salary in salaries if salary is not None]
+        summ_salaries = sum(salaries)
+        len_salaries = len(salaries)
+
+        mean_salary = int(summ_salaries / len_salaries)
+
+        return mean_salary
+
+def predict_salaries(salary):
+    estimated_salary = None
+
+    if salary['from'] and salary['to']:
+        estimated_salary = (salary['from'] + salary['to']) / 2
+    elif salary['from']:
+        estimated_salary = salary['from'] * 1.2
+    elif salary['to']:
+        estimated_salary = salary['to'] * 0.8
+
+    return estimated_salary
 
 def create_vacancies_stat_table(statistics, title=''):
     table_data = [['Язык программирования',
