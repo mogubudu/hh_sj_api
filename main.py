@@ -11,7 +11,7 @@ def get_stat_to_most_popular_language_hh(languages=[]):
         query = f'Программист {language}'
         response = get_vacancies_from_hh(query)
         vacancies_found, salaries = response
-        salaries = get_salaries_hh(salaries)
+        salaries = predict_salaries_hh(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
@@ -48,23 +48,16 @@ def get_vacancies_from_hh(text):
     return vacancies_found, vacancies
 
 
-def get_salaries_hh(vacancies):
+def predict_salaries_hh(vacancies):
     processed_vacancies = []
     for vacancy in vacancies:
-        salary = get_salary_from_hh(vacancy)
-        if salary:
-            processed_salary = predict_salaries(salary)
+        if (vacancy['salary'] and
+                vacancy['salary']['currency'] == 'RUR'):
+
+            processed_salary = predict_salaries(vacancy['salary']['from'],
+                                                vacancy['salary']['to'])
             processed_vacancies.append(processed_salary)
     return processed_vacancies
-
-
-def get_salary_from_hh(vacancy):
-    if vacancy['salary'] and vacancy['salary']['currency'] == 'RUR':
-        salary = {
-            'from': vacancy['salary']['from'],
-            'to': vacancy['salary']['to']
-        }
-        return salary
 
 
 def get_vacancies_from_superjob(secret_key, keywords=''):
@@ -94,23 +87,14 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
     return vacancies_found, vacancies
 
 
-def get_salaries_superjob(vacancies):
+def predict_salaries_superjob(vacancies):
     processed_vacancies = []
     for vacancy in vacancies:
-        salary = get_salary_from_superjob(vacancy)
-        if salary:
-            processed_salary = predict_salaries(salary)
+        if vacancy['currency'] == 'rub':
+            processed_salary = predict_salaries(vacancy['payment_from'],
+                                                vacancy['payment_to'])
             processed_vacancies.append(processed_salary)
     return processed_vacancies
-
-
-def get_salary_from_superjob(vacancy):
-    if vacancy['currency'] == 'rub':
-        salary = {
-            'from': vacancy['payment_from'],
-            'to': vacancy['payment_to']
-        }
-        return salary
 
 
 def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
@@ -120,7 +104,7 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
         keywords = f'Программист {language}'
         response = get_vacancies_from_superjob(secret_key, keywords=keywords)
         vacancies_found, salaries = response
-        salaries = get_salaries_superjob(salaries)
+        salaries = predict_salaries_superjob(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
@@ -141,15 +125,15 @@ def get_mean_estimated_salary(salaries):
         return mean_salary
 
 
-def predict_salaries(salary):
+def predict_salaries(salary_from, salary_to):
     estimated_salary = None
 
-    if salary['from'] and salary['to']:
-        estimated_salary = (salary['from'] + salary['to']) / 2
-    elif salary['from']:
-        estimated_salary = salary['from'] * 1.2
-    elif salary['to']:
-        estimated_salary = salary['to'] * 0.8
+    if salary_from and salary_to:
+        estimated_salary = (salary_from + salary_to) / 2
+    elif salary_from:
+        estimated_salary = salary_from * 1.2
+    elif salary_to:
+        estimated_salary = salary_to * 0.8
 
     return estimated_salary
 
