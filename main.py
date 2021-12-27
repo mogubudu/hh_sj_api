@@ -114,7 +114,7 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
 
 def get_mean_estimated_salary(salaries):
     if salaries:
-        salaries = [salary for salary in salaries if salary is not None]
+        salaries = [salary for salary in salaries if salary]
         summ_salaries = sum(salaries)
         len_salaries = len(salaries)
 
