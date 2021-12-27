@@ -54,7 +54,7 @@ def predict_hh_salaries(vacancies):
                 vacancy['salary']['currency'] == 'RUR'):
 
             processed_salary = predict_salary(vacancy['salary']['from'],
-                                                vacancy['salary']['to'])
+                                              vacancy['salary']['to'])
             processed_vacancies.append(processed_salary)
     return processed_vacancies
 
@@ -91,7 +91,7 @@ def predict_superjob_salaries(vacancies):
     for vacancy in vacancies:
         if vacancy['currency'] == 'rub':
             processed_salary = predict_salary(vacancy['payment_from'],
-                                                vacancy['payment_to'])
+                                              vacancy['payment_to'])
             processed_vacancies.append(processed_salary)
     return processed_vacancies
 
@@ -101,7 +101,8 @@ def get_superjob_language_stat(secret_key, languages=[]):
 
     for language in languages:
         keywords = f'Программист {language}'
-        vacancies_found, salaries = get_vacancies_from_superjob(secret_key, keywords=keywords)
+        vacancies_found, salaries = get_vacancies_from_superjob(secret_key,
+                                                                keywords)
         salaries = predict_superjob_salaries(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
@@ -138,9 +139,9 @@ def predict_salary(salary_from, salary_to):
 
 def create_vacancies_stat_table(statistics, title=''):
     table = [['Язык программирования',
-                   'Вакансий найдено',
-                   'Вакансий обработано',
-                   'Средняя зарплата']]
+              'Вакансий найдено',
+              'Вакансий обработано',
+              'Средняя зарплата']]
 
     for language, language_statistics in statistics.items():
         row = [
