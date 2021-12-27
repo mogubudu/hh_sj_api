@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def get_stat_to_most_popular_language_hh(languages=[]):
+def get_stat_to_language_hh(languages=[]):
     vacancies_stat = dict()
     for language in languages:
         query = f'Программист {language}'
@@ -96,7 +96,7 @@ def predict_salaries_superjob(vacancies):
     return processed_vacancies
 
 
-def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
+def get_stat_to_language_superjob(secret_key, languages=[]):
     vacancies_stat = dict()
 
     for language in languages:
@@ -172,12 +172,12 @@ def main():
         'scala',
         'swift'
     ]
-    statistics_sj = get_stat_to_most_popular_language_superjob(
+    statistics_sj = get_stat_to_language_superjob(
         secret_key=secret_key,
         languages=most_popular_languages
     )
 
-    statistics_hh = get_stat_to_most_popular_language_hh(
+    statistics_hh = get_stat_to_language_hh(
         languages=most_popular_languages
     )
 
