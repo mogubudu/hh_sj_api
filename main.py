@@ -53,7 +53,7 @@ def predict_hh_salaries(vacancies):
         if (vacancy['salary'] and
                 vacancy['salary']['currency'] == 'RUR'):
 
-            processed_salary = predict_salaries(vacancy['salary']['from'],
+            processed_salary = predict_salary(vacancy['salary']['from'],
                                                 vacancy['salary']['to'])
             processed_vacancies.append(processed_salary)
     return processed_vacancies
@@ -90,7 +90,7 @@ def predict_superjob_salaries(vacancies):
     processed_vacancies = []
     for vacancy in vacancies:
         if vacancy['currency'] == 'rub':
-            processed_salary = predict_salaries(vacancy['payment_from'],
+            processed_salary = predict_salary(vacancy['payment_from'],
                                                 vacancy['payment_to'])
             processed_vacancies.append(processed_salary)
     return processed_vacancies
@@ -123,7 +123,7 @@ def get_mean_estimated_salary(salaries):
         return mean_salary
 
 
-def predict_salaries(salary_from, salary_to):
+def predict_salary(salary_from, salary_to):
     estimated_salary = None
 
     if salary_from and salary_to:
