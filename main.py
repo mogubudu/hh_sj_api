@@ -9,8 +9,7 @@ def get_stat_to_most_popular_language_hh(languages=[]):
     vacancies_stat = dict()
     for language in languages:
         query = f'Программист {language}'
-        response = get_vacancies_from_hh(query)
-        vacancies_found, salaries = response
+        vacancies_found, salaries = get_vacancies_from_hh(query)
         salaries = predict_salaries_hh(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
@@ -102,8 +101,7 @@ def get_stat_to_most_popular_language_superjob(secret_key, languages=[]):
 
     for language in languages:
         keywords = f'Программист {language}'
-        response = get_vacancies_from_superjob(secret_key, keywords=keywords)
-        vacancies_found, salaries = response
+        vacancies_found, salaries = get_vacancies_from_superjob(secret_key, keywords=keywords)
         salaries = predict_salaries_superjob(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
