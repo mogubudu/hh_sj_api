@@ -71,10 +71,10 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
             'page': page,
             'keywords': ['keys', keywords]
         }
-        data = {
+        headers = {
             'X-Api-App-Id': secret_key,
         }
-        response = requests.get(url, params=params, headers=data)
+        response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         response = response.json()
         vacancies.extend(response['objects'])
@@ -137,7 +137,7 @@ def predict_salaries(salary_from, salary_to):
 
 
 def create_vacancies_stat_table(statistics, title=''):
-    table_data = [['Язык программирования',
+    table = [['Язык программирования',
                    'Вакансий найдено',
                    'Вакансий обработано',
                    'Средняя зарплата']]
@@ -150,9 +150,9 @@ def create_vacancies_stat_table(statistics, title=''):
             language_statistics['average_salary']
         ]
 
-        table_data.append(row)
+        table.append(row)
 
-    table = AsciiTable(table_data, title)
+    table = AsciiTable(table, title)
     return table.table
 
 
