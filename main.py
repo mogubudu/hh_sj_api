@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def get_stat_to_language_hh(languages=[]):
+def get_hh_language_stat(languages=[]):
     vacancies_stat = dict()
     for language in languages:
         query = f'Программист {language}'
         vacancies_found, salaries = get_vacancies_from_hh(query)
-        salaries = predict_salaries_hh(salaries)
+        salaries = predict_hh_salaries(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
@@ -47,7 +47,7 @@ def get_vacancies_from_hh(text):
     return vacancies_found, vacancies
 
 
-def predict_salaries_hh(vacancies):
+def predict_hh_salaries(vacancies):
     processed_vacancies = []
     for vacancy in vacancies:
         if (vacancy['salary'] and
@@ -86,7 +86,7 @@ def get_vacancies_from_superjob(secret_key, keywords=''):
     return vacancies_found, vacancies
 
 
-def predict_salaries_superjob(vacancies):
+def predict_superjob_salaries(vacancies):
     processed_vacancies = []
     for vacancy in vacancies:
         if vacancy['currency'] == 'rub':
@@ -96,13 +96,13 @@ def predict_salaries_superjob(vacancies):
     return processed_vacancies
 
 
-def get_stat_to_language_superjob(secret_key, languages=[]):
+def get_superjob_language_stat(secret_key, languages=[]):
     vacancies_stat = dict()
 
     for language in languages:
         keywords = f'Программист {language}'
         vacancies_found, salaries = get_vacancies_from_superjob(secret_key, keywords=keywords)
-        salaries = predict_salaries_superjob(salaries)
+        salaries = predict_superjob_salaries(salaries)
         vacancies_stat[language] = {
             'vacancies_found': vacancies_found,
             'vacancies_processed': len(salaries),
@@ -172,18 +172,18 @@ def main():
         'scala',
         'swift'
     ]
-    statistics_sj = get_stat_to_language_superjob(
+    sj_statistics = get_superjob_language_stat(
         secret_key=secret_key,
         languages=most_popular_languages
     )
 
-    statistics_hh = get_stat_to_language_hh(
+    hh_statistics = get_hh_language_stat(
         languages=most_popular_languages
     )
 
-    sj_table = create_vacancies_stat_table(statistics_sj,
+    sj_table = create_vacancies_stat_table(sj_statistics,
                                            title='SuperJob Moscow')
-    hh_table = create_vacancies_stat_table(statistics_hh,
+    hh_table = create_vacancies_stat_table(hh_statistics,
                                            title='HeadHunter Moscow')
     print(sj_table)
     print(hh_table)
